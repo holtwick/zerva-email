@@ -1,13 +1,11 @@
-// <reference path="node_modules/zerva-module-template/dist/esm/index.d.ts" />
-
-// Simple demo for node and CommonJS loading
-
 import {
   Logger,
   LoggerFileHandler,
   LoggerNodeHandler,
   LogLevel,
+  setupEnv,
   valueToInteger,
+  valueToString,
 } from "zeed"
 
 Logger.setHandlers([
@@ -24,32 +22,36 @@ Logger.setHandlers([
   }),
 ])
 
+setupEnv()
+
 const log = Logger("app")
+log.info("app")
 
-import { resolve } from "path"
-
-function resolveConfig() {
-  const p = resolve("config.js")
-  log.info("config from:", p)
-  import(p)
-    .then((config) => log.info("config.test =", config.default.test))
-    .catch((err) => log.warn("resolveConfig err:", err))
-}
-
-resolveConfig()
-
-import { emit, on, serve, useHttp } from "zerva"
-
-// import { useCounter } from "zerva-module-template"
+import { serve, on, emit, useHttp } from "zerva"
+import { useEmail } from "zerva-email"
 
 useHttp({
   port: valueToInteger(process.env.PORT, 8080),
 })
 
-// on("counterIncrement", (counter) => {
-//   log.info("counter inc", counter)
-// })
+const transport = {
+  host: valueToString(process.env.EMAIL_HOST),
+  port: valueToInteger(process.env.EMAIL_PORT),
+  secure: true,
+  auth: {
+    user: valueToString(process.env.EMAIL_USER),
+    pass: valueToString(process.env.EMAIL_PASS),
+  },
+}
 
-// useCounter()
+log.info("email transport", JSON.stringify(transport, null, 2))
 
-// serve()
+useEmail({ transport })
+
+on("serveStart", () => {
+  emit("emailSend", {
+    to: "dirk.holtwick@gmail.com",
+  })
+})
+
+serve()

@@ -5,13 +5,13 @@ import { Logger } from "zeed"
 import { on, register } from "zerva"
 import { ZEmailConfig } from "./types"
 
-const name = "counter"
+const name = "email"
 const log = Logger(`zerva:${name}`)
 
 export function useEmail(config: ZEmailConfig) {
   const { transport } = config
   log.info(`use ${name}`)
-  register(name, ["http"])
+  register(name)
   on("emailSend", async (info) => {
     const {
       to,
@@ -19,21 +19,10 @@ export function useEmail(config: ZEmailConfig) {
       subject = "Zerva Email",
       text = `Message from Zerva`,
     } = info
+    log.info(`will send to ${to}`)
 
     return new Promise((resolve, reject) => {
       var transporter = nodemailer.createTransport(transport)
-
-      // {
-      //   host: "example.com",
-      //   port: 465,
-      //   secure: true,
-      //   // requireTLS: true,
-      //   auth: {
-      //     user: "user@example.com",
-      //     pass: "xxx",
-      //   },
-      // })
-
       transporter.sendMail(
         {
           to,
@@ -46,7 +35,7 @@ export function useEmail(config: ZEmailConfig) {
             log.error(error)
             reject(error)
           } else {
-            log("Email sent: " + info.response)
+            log.info(`Email sent to ${to}: ` + info.response)
             resolve(info.response)
           }
         }
