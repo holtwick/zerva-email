@@ -26,18 +26,30 @@ Logger.setHandlers([
 
 const log = Logger("app")
 
+import { resolve } from "path"
+
+function resolveConfig() {
+  const p = resolve("config.js")
+  log.info("config from:", p)
+  import(p)
+    .then((config) => log.info("config.test =", config.default.test))
+    .catch((err) => log.warn("resolveConfig err:", err))
+}
+
+resolveConfig()
+
 import { emit, on, serve, useHttp } from "zerva"
 
-import { useCounter } from "zerva-module-template"
+// import { useCounter } from "zerva-module-template"
 
 useHttp({
   port: valueToInteger(process.env.PORT, 8080),
 })
 
-on("counterIncrement", (counter) => {
-  log.info("counter inc", counter)
-})
+// on("counterIncrement", (counter) => {
+//   log.info("counter inc", counter)
+// })
 
-useCounter()
+// useCounter()
 
-serve()
+// serve()
