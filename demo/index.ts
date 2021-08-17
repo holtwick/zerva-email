@@ -50,7 +50,7 @@ useEmail({ transport })
 
 on("serveStart", () => {
   emit("emailSend", {
-    to: "dirk.holtwick@gmail.com",
+    to: valueToString(process.env.EMAIL_TO, "example@example.com"),
   })
 })
 
