@@ -18,6 +18,7 @@ export function useEmail(config: ZEmailConfig) {
       from = `zerva@holtwick.de`,
       subject = "Zerva Email",
       text = `Message from Zerva`,
+      ...others
     } = info
     log.info(`will send to ${to}`)
 
@@ -29,6 +30,7 @@ export function useEmail(config: ZEmailConfig) {
           from,
           subject,
           text,
+          ...others,
         },
         (error, info) => {
           if (error) {
